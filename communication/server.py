@@ -12,7 +12,6 @@ class Server:
         self.conn.sendall(bytes(data, encoding="utf-8"))
 
 
-
 def setup_connection(host, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
