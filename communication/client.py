@@ -1,10 +1,17 @@
-import socketserver
+import communication.protocol as protocol
 import socket
 
 
 class Client:
     def __init__(self, port):
         self.soc = setup_connection('localhost', port)
+        self.protocol = self.send_syn_request()
+
+    def send_syn_request(self):
+        request = protocol.create_syn_request()
+        self.send_request(request)
+        response = self.get_response()
+        return protocol.parse_response(response)
 
     def send_request(self, data):
         self.soc.sendall(bytes(data, encoding="utf-8"))
@@ -28,25 +35,3 @@ def setup_connection(host, port):
         except Exception as e:
             print(e)
     return s
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
