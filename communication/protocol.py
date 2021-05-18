@@ -20,7 +20,7 @@ TERMINATE = 'TERMINATE'
 
 def create_syn_request():
     request = {'type': SYN}
-    return request
+    return json.dumps(request)
 
 
 def create_detection_request(image_path, region, b_boxes=False):
@@ -54,12 +54,12 @@ def parse_response(response):
 
 def create_error_response(message):
     response = {'type': ERROR, 'message': message}
-    return response
+    return json.dumps(response)
 
 
 def create_syn_response(protocol):
     response = {'type': SYN, 'data': {'protocol': protocol}}
-    return response
+    return json.dumps(response)
 
 
 def create_ed_response(protocol, response):
@@ -79,12 +79,12 @@ def create_detection_response(detection, b_boxes=None):
 
 def create_classification_response(classification):
     response = {'type': CLASSIFY, 'data': {'classification': classification}}
-    return response
+    return json.dumps(response)
 
 
 def parse_request(request, expected_types=None):
     data = json.loads(request)
-    if expected_types is not None and request['type'] not in expected_types:
+    if expected_types is not None and data['type'] not in expected_types:
         raise Exception('Incompatible request type')
 
     if data['type'] == SYN:
