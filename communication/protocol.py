@@ -23,8 +23,8 @@ def create_syn_request():
     return request
 
 
-def create_detection_request(image_path, region, bbox=False):
-    request = {'type': DETECT, 'data': {'image_path': image_path, 'region': region, 'bbox': bbox}}
+def create_detection_request(image_path, region, b_boxes=False):
+    request = {'type': DETECT, 'data': {'image_path': image_path, 'region': region, 'b_boxes': b_boxes}}
     return json.dumps(request)
 
 
@@ -43,7 +43,7 @@ def parse_response(response):
     if data['type'] == SYN:
         return data['data']['protocol']
     elif data['type'] == DETECT:
-        return data['data']['detections'], data['data']['bbox'] if 'bbox' in data['data'] else None
+        return data['data']['detection'], data['data']['b_boxes'] if 'b_boxes' in data['data'] else None
     elif data['type'] == CLASSIFY:
         return data['data']['classification']
     elif data['type'] == ERROR:
@@ -64,16 +64,16 @@ def create_syn_response(protocol):
 
 def create_ed_response(protocol, response):
     if protocol == DETECT:
-        detection, bbox = response
-        return create_detection_response(detection, bbox)
+        detection, b_boxes = response
+        return create_detection_response(detection, b_boxes)
     elif protocol == CLASSIFY:
         return create_classification_response(response)
 
 
-def create_detection_response(detections, bbox=None):
-    response = {'type': DETECT, 'data': {'detections': detections}}
-    if bbox is not None:
-        response['data']['bbox'] = bbox
+def create_detection_response(detection, b_boxes=None):
+    response = {'type': DETECT, 'data': {'detection': detection}}
+    if b_boxes is not None:
+        response['data']['b_boxes'] = b_boxes
     return json.dumps(response)
 
 
@@ -90,7 +90,7 @@ def parse_request(request, expected_types=None):
     if data['type'] == SYN:
         return SYN
     elif data['type'] == DETECT:
-        return data['data']['image_path'], data['data']['region'], data['data']['bbox']
+        return data['data']['image_path'], data['data']['region'], data['data']['b_boxes']
     elif data['type'] == CLASSIFY:
         return data['data']['image_path']
     elif data['type'] == TERMINATE:
