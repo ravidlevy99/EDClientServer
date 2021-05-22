@@ -48,6 +48,8 @@ def parse_response(response):
         return data['data']['classification']
     elif data['type'] == ERROR:
         raise Exception('The event detector has return the following error:\n' + data['message'])
+    elif data['type'] == TERMINATE:
+        return TERMINATE
     else:
         raise Exception('Unknown response from server')
 
@@ -80,6 +82,10 @@ def create_detection_response(detection, b_boxes=None):
 def create_classification_response(classification):
     response = {'type': CLASSIFY, 'data': {'classification': classification}}
     return json.dumps(response)
+
+def create_terminate_response():
+    request = {'type': TERMINATE}
+    return json.dumps(request)
 
 
 def parse_request(request, expected_types=None):

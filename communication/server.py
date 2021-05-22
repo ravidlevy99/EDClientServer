@@ -52,6 +52,7 @@ class Server(ABC):
             try:
                 data = protocol.parse_request(request, [self.protocol, protocol.TERMINATE])
                 if data == protocol.TERMINATE:
+                    self.answer(protocol.create_terminate_response())
                     self.on_termination()
                     break
                 self.queue.put(data)
@@ -66,7 +67,7 @@ class Server(ABC):
         pass
 
     def on_termination(self):
-        pass
+        self.conn.close()
 
 
 def setup_connection(host, port):
@@ -74,4 +75,5 @@ def setup_connection(host, port):
     s.bind((host, port))
     s.listen()
     conn, addr = s.accept()
+    s.close()
     return conn

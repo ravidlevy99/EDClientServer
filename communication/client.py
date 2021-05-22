@@ -13,6 +13,12 @@ class Client:
         response = self.get_response()
         return protocol.parse_response(response)
 
+    def stop_communication(self):
+        self.send_request(protocol.create_terminate_request())
+        if self.get_response() == protocol.TERMINATE:
+            self.soc.close()
+
+
     def send_request(self, data):
         self.soc.sendall(bytes(data, encoding="utf-8"))
 
