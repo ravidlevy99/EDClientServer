@@ -7,7 +7,8 @@ from threading import Thread
 
 
 class Server(ABC, jsocket.Server):
-    def __init__(self, port, chosen_protocol):
+    def __init__(self, host, port, chosen_protocol):
+        super.__init__(host, port)
         self.protocol = chosen_protocol
         self.queue = queue.Queue()
         if self.get_syn_request(chosen_protocol):
