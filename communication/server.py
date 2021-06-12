@@ -1,13 +1,13 @@
 import communication.protocol as protocol
 import socket
 from abc import ABC, abstractmethod
+import communication.jsonsocket as jsocket
 import queue
 from threading import Thread
 
 
-class Server(ABC):
+class Server(ABC, jsocket.Server):
     def __init__(self, port, chosen_protocol):
-        self.conn = setup_connection('localhost', port)
         self.protocol = chosen_protocol
         self.queue = queue.Queue()
         if self.get_syn_request(chosen_protocol):
@@ -27,10 +27,10 @@ class Server(ABC):
         return True
 
     def get_request(self):
-        return str(self.conn.recv(1024).decode('utf-8'))
+        return self.recv()
 
     def answer(self, data):
-        self.conn.sendall(bytes(data, encoding="utf-8"))
+        self.send(data)
 
     def ed_handle_request_loop(self):
         while True:
@@ -48,6 +48,7 @@ class Server(ABC):
         ed_handling_thread.start()
 
         while True:
+            self.accept()
             request = self.get_request()
             try:
                 data = protocol.parse_request(request, [self.protocol, protocol.TERMINATE])
@@ -67,13 +68,5 @@ class Server(ABC):
         pass
 
     def on_termination(self):
-        self.conn.close()
+        self.close()
 
-
-def setup_connection(host, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((host, port))
-    s.listen()
-    conn, addr = s.accept()
-    s.close()
-    return conn

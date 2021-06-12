@@ -1,10 +1,10 @@
 import communication.protocol as protocol
 import socket
+import communication.jsonsocket as jsocket
 
 
-class Client:
-    def __init__(self, port):
-        self.soc = setup_connection('localhost', port)
+class Client(jsocket.Client):
+    def __init__(self):
         self.protocol = self.send_syn_request()
 
     def send_syn_request(self):
@@ -16,14 +16,21 @@ class Client:
     def stop_communication(self):
         self.send_request(protocol.create_terminate_request())
         if self.get_response() == protocol.TERMINATE:
-            self.soc.close()
-
+            self.close()
 
     def send_request(self, data):
-        self.soc.sendall(bytes(data, encoding="utf-8"))
+        self.send(data)
 
     def get_response(self):
-        return self.soc.recv(10000).decode('utf-8')
+        return self.recv()
+
+    def setup_connection(self, host, port):
+        while True:
+            try:
+                self.connect(host, port)
+                break
+            except Exception as e:
+                print(e)
 
 
 def get_free_port():
@@ -32,12 +39,4 @@ def get_free_port():
     #     return s.server_address[1]
 
 
-def setup_connection(host, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    while True:
-        try:
-            s.connect((host, port))
-            break
-        except Exception as e:
-            print(e)
-    return s
+
