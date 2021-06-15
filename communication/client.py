@@ -1,5 +1,6 @@
 import communication.protocol as protocol
 import socket
+import struct
 
 
 class Client:
@@ -12,18 +13,26 @@ class Client:
         self.send_request(request)
         response = self.get_response()
         return protocol.parse_response(response)
+        return protocol.parse_response(response)
 
     def stop_communication(self):
         self.send_request(protocol.create_terminate_request())
         if self.get_response() == protocol.TERMINATE:
             self.soc.close()
 
-
     def send_request(self, data):
-        self.soc.sendall(bytes(data, encoding="utf-8"))
+        serialized_data = bytes(data, encoding="utf-8")
+        self.soc.sendall(struct.pack('>I', len(serialized_data)))
+        self.soc.sendall(serialized_data)
 
     def get_response(self):
-        return self.soc.recv(10000).decode('utf-8')
+        data_size = struct.unpack('>I', self.soc.recv(4))[0]
+        received_payload = b""
+        reamining_payload_size = data_size
+        while reamining_payload_size != 0:
+            received_payload += self.soc.recv(reamining_payload_size)
+            reamining_payload_size = data_size - len(received_payload)
+        return str(received_payload.decode('utf-8'))
 
 
 def get_free_port():

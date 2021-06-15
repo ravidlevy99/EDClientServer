@@ -3,6 +3,7 @@ import socket
 from abc import ABC, abstractmethod
 import queue
 from threading import Thread
+import struct
 
 
 class Server(ABC):
@@ -27,10 +28,18 @@ class Server(ABC):
         return True
 
     def get_request(self):
-        return str(self.conn.recv(1024).decode('utf-8'))
+        data_size = struct.unpack('>I', self.conn.recv(4))[0]
+        received_payload = b""
+        reamining_payload_size = data_size
+        while reamining_payload_size != 0:
+            received_payload += self.conn.recv(reamining_payload_size)
+            reamining_payload_size = data_size - len(received_payload)
+        return str(received_payload.decode('utf-8'))
 
     def answer(self, data):
-        self.conn.sendall(bytes(data, encoding="utf-8"))
+        serialized_data = bytes(data, encoding="utf-8")
+        self.conn.sendall(struct.pack('>I', len(serialized_data)))
+        self.conn.sendall(serialized_data)
 
     def ed_handle_request_loop(self):
         while True:
