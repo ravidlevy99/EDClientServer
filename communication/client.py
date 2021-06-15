@@ -13,7 +13,6 @@ class Client:
         self.send_request(request)
         response = self.get_response()
         return protocol.parse_response(response)
-        return protocol.parse_response(response)
 
     def stop_communication(self):
         self.send_request(protocol.create_terminate_request())
@@ -36,9 +35,11 @@ class Client:
 
 
 def get_free_port():
-    return 55555
-    # with socketserver.TCPServer(("localhost", 0), None) as s:
-    #     return s.server_address[1]
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("", 0))
+    port = s.getsockname()[1]
+    s.close()
+    return port
 
 
 def setup_connection(host, port):
