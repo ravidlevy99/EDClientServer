@@ -44,7 +44,9 @@ class Server(ABC):
     def ed_handle_request_loop(self):
         while True:
             data = self.queue.get()
-
+            if data == protocol.RESET:
+                self.reset()
+                continue
             ed_data = self.handle_request(data)
             response = protocol.create_ed_response(self.protocol, ed_data)
             self.answer(response)
