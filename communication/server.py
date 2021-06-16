@@ -59,7 +59,7 @@ class Server(ABC):
         while True:
             request = self.get_request()
             try:
-                data = protocol.parse_request(request, [self.protocol, protocol.TERMINATE])
+                data = protocol.parse_request(request, [self.protocol, protocol.TERMINATE, protocol.RESET])
                 if data == protocol.TERMINATE:
                     self.answer(protocol.create_terminate_response())
                     self.on_termination()
@@ -73,6 +73,10 @@ class Server(ABC):
 
     @abstractmethod
     def handle_request(self, data):
+        pass
+
+    @abstractmethod
+    def reset(self):
         pass
 
     def on_termination(self):

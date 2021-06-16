@@ -6,6 +6,7 @@ IM_DETECT = 'IM_DETECT'
 CLASSIFY = 'CLASSIFY'
 ERROR = 'ERROR'
 TERMINATE = 'TERMINATE'
+RESET = 'RESET'
 
 """
     The format of the messages is:
@@ -43,6 +44,10 @@ def create_terminate_request():
     request = {'type': TERMINATE}
     return json.dumps(request)
 
+def create_reset_request():
+    request = {'type': RESET}
+    return json.dumps(request)
+
 
 def parse_response(response):
     data = json.loads(response)
@@ -58,6 +63,8 @@ def parse_response(response):
         raise Exception('The event detector has return the following error:\n' + data['message'])
     elif data['type'] == TERMINATE:
         return TERMINATE
+    elif data['type'] == RESET:
+        return RESET
     else:
         raise Exception('Unknown response from server')
 
@@ -120,5 +127,7 @@ def parse_request(request, expected_types=None):
         return data['data']['image_path']
     elif data['type'] == TERMINATE:
         return TERMINATE
+    elif data['type'] == RESET:
+        return RESET
     else:
         raise Exception('Unknown request from client')
