@@ -2,6 +2,7 @@ import communication.protocol as protocol
 import socket
 import struct
 
+
 class Client:
     def __init__(self, port):
         self.soc = setup_connection('localhost', port)
